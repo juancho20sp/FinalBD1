@@ -1,0 +1,46 @@
+body{
+    font-size: 1.6rem;
+    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+}
+
+.super-container{
+    position: relative;
+    min-height: 100vh;
+}
+
+.upper-jumbotron{
+    height: 50px;
+}
+
+.super-link{
+    padding-right: 25px;
+}
+
+.super-link a {
+    color: white;
+    font-size: 1.6rem;
+}
+
+.super-link a:hover{
+    cursor: pointer;
+}
+
+.jumbotron{
+    padding-top: 25px;
+    padding-bottom: 15px;
+}
+main{
+    padding-bottom: 3rem;
+}
+
+footer{
+    padding-top: 20px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: inherit;
+}
+
+#rights{
+    font-size: 1.3rem;
+}
