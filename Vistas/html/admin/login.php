@@ -1,3 +1,7 @@
+<?php
+    require_once "../../../Gestion/loginValidation.php";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,17 +24,18 @@
     <main id="super-card">
        <div class="container-fluid row">
             <div class="" id="card">
-                <form>
+                <form method="post">
                     <div class="form-group">
                         <label for="usuario">Usuario:</label>
-                        <input type="text" class="form-control" id="usuario" placeholder="Ingrese su usuario">
+                        <input name="usuario" type="text" class="form-control" id="usuario" placeholder="Ingrese su usuario">
                     </div>
                     <div class="from-group" id="lower">
                         <label for="password">Contraseña:</label>
-                        <input type="password" class="form-control" id="password" placeholder="Ingrese su contraseña">
+                        <input name="password" type="password" class="form-control" id="password" placeholder="Ingrese su contraseña">
                     </div>
-                    <button type="button" class="btn btn-primary ml-1"><a href="index.html">Ingresar</a></button>
+                    <button type="submit" class="btn btn-primary ml-1">Ingresar</button>
                     <button type="button" class="btn btn-secondary">Cancelar</button>
+                    <a href="signup.php">Registrar un usuario</a>
                 </form>
             </div>
        </div>
