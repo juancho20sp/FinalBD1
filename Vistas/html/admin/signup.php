@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
-    <link rel="stylesheet" href="../admin/css/loginStyle.css">
+    <link rel="stylesheet" href="../admin/css/signinStyle.css">
     <title>Admin Login</title>
 </head>
 <body class="super-container">
@@ -25,12 +25,16 @@
             <div class="" id="card">
                 <form method="post">
                     <div class="form-group">
-                        <label for="usuario">Nombre:</label>
+                        <label for="nombre">Nombre:</label>
                         <input name="nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
                     </div>
                     <div class="form-group">
-                        <label for="usuario">Apellidos:</label>
+                        <label for="apellidos">Apellidos:</label>
                         <input name="apellidos" type="text" class="form-control" id="apellidos" placeholder="Ingrese sus apellidos">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input name="email" type="text" class="form-control" id="email" placeholder="Ingrese su usuario">
                     </div>
                     <div class="form-group">
                         <label for="usuario">Usuario:</label>

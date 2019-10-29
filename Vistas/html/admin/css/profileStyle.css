@@ -56,3 +56,18 @@ footer{
     -webkit-border-radius: 19px 19px 19px 19px;
     border: 0px solid #000000;
 }
+
+.profile-container{
+    margin-top: 15px;
+}
+
+.subprofile{
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.card2{
+   max-width: 85%;
+   margin: 0 auto;
+   padding: 15px 15px;
+}

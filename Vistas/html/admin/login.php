@@ -1,5 +1,34 @@
-<?php
-    require_once "../../../Gestion/loginValidation.php";
+<?php    
+    require_once "../../../Gestion/loginValidation.php";  
+    session_start();
+
+    if(isset($_POST['usuario']) && isset($_POST['password'])){
+        unset($_SESSION['usuario']); //Logout al usuario actual
+        
+        $sql = "SELECT * FROM admins WHERE
+                 (email = :em OR username = :usr)
+                 AND password = :pas";
+         
+         $stmt = $pdo->prepare($sql);
+         $stmt -> execute(array(
+             ':em' => $_POST['usuario'],
+             ':usr' => $_POST['usuario'],
+             ':pas' => $_POST['password']
+         ));
+ 
+         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+ 
+         if($row === false){
+             $_SESSION['error'] = 'Usuario o contraseña incorrecta.';
+             header('Location: login.php');
+             return;
+         } else {
+             $_SESSION['usuario'] = $_POST['usuario'];
+             header('Location: index.php');
+             return;
+         }
+     }
+    
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +62,19 @@
                         <label for="password">Contraseña:</label>
                         <input name="password" type="password" class="form-control" id="password" placeholder="Ingrese su contraseña">
                     </div>
-                    <button type="submit" class="btn btn-primary ml-1">Ingresar</button>
+
+                    <?php
+                        if (isset($_SESSION['error'])){
+                            echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
+                            unset($_SESSION["error"]);
+                        }    
+                        
+                        if (isset($_SESSION['success'])){
+                            echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
+                            unset($_SESSION["success"]);
+                        }  
+                    ?>
+                    <button type="submit" class="btn btn-primary ml-1" name="enter">Ingresar</button>
                     <button type="button" class="btn btn-secondary">Cancelar</button>
                     <a href="signup.php">Registrar un usuario</a>
                 </form>

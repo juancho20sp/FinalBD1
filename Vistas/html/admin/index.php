@@ -1,3 +1,13 @@
+<?php
+    session_start();
+        
+    if(!isset($_SESSION['usuario'])){
+        header("Location: login.php");
+        return;
+    }
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +22,11 @@
 <body class="super-container">
     <header class="container-fluid">
         <div class="upper-jumbotron bg-secondary">
+            <div class="float-left">
+                <p>Bienvenido, <?= $_SESSION['usuario']?></p>
+            </div>
             <div class="float-right super-link" >
-                <a href="login.html"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                <a href="../../../Gestion/logout.php"><i class="fas fa-sign-out-alt"></i> Salir</a>
             </div>
         </div>
         <div class="jumbotron">
@@ -25,7 +38,7 @@
 
         <!--Navbar-->
         <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-            <a href="../admin/index.html" class="nav-link">Mi tiendita</a>
+            <a href="../admin/index.php" class="nav-link">Mi tiendita</a>
             <button class="navbar-toggler" type="button" data-target="#navbarItems" aria-controls="navbarItems"
                  aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -34,7 +47,7 @@
             <div class="collapse navbar-collapse" id="navbarItems">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="menu.html">Menú <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="menu.php">Menú <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -69,7 +82,7 @@
                     </li>
                     <p> | </p>
                     <li class="nav-item active">
-                        <a class="nav-link" href="profile.html"><i class="fas fa-user-circle fa-lg"></i><span class="sr-only">(profile)</span></a>
+                        <a class="nav-link" href="profile.php"><i class="fas fa-user-circle fa-lg"></i><span class="sr-only">(profile)</span></a>
                     </li>
                 </ul>
             </div>
