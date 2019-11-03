@@ -24,13 +24,25 @@
        <div class="container-fluid row">
             <div class="" id="card">
                 <form method="post">
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input name="nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label for="nombre">Nombre:</label>
+                            <input name="nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="apellidos">Apellidos:</label>
+                            <input name="apellidos" type="text" class="form-control" id="apellidos" placeholder="Ingrese sus apellidos">
+                        </div>                    
                     </div>
-                    <div class="form-group">
-                        <label for="apellidos">Apellidos:</label>
-                        <input name="apellidos" type="text" class="form-control" id="apellidos" placeholder="Ingrese sus apellidos">
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label for="Identificacion">Identificación:</label>
+                            <input name="Identificacion" type="text" class="form-control" id="Identificacion" placeholder="Ingrese su Identificación">
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="Telefono">Teléfono:</label>
+                            <input name="Telefono" type="text" class="form-control" id="Telefono" placeholder="Ingrese su Teléfono">
+                        </div>                    
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
@@ -44,6 +56,13 @@
                         <label for="password">Contraseña:</label>
                         <input name="password" type="password" class="form-control" id="password" placeholder="Ingrese su contraseña">
                     </div>
+                    <?php
+                        if (isset($_SESSION['error'])){
+                            echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
+                            unset($_SESSION["error"]);
+                        } 
+                    ?>
+
                     <button type="submit" class="btn btn-primary ml-1">Registrar</button>
                     <button type="button" class="btn btn-secondary">Cancelar</button>
                     <a href="login.php">Volver</a>

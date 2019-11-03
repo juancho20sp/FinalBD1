@@ -1,9 +1,20 @@
 <?php
+    require_once "../../../Gestion/pdo.php";  
     session_start();
         
     if(!isset($_SESSION['usuario'])){
         header("Location: login.php");
         return;
+    } else {
+        $sql = "SELECT Nombre FROM usuarios WHERE (Username = :usr OR Email = :em )";
+        $stmt = $pdo->prepare($sql);
+        $stmt -> execute(array(
+            ':em' => $_SESSION['usuario'],
+            ':usr' => $_SESSION['usuario']
+        ));
+
+        $row = $stmt ->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['nombre'] = $row['Nombre'];
     }
 
 ?>
@@ -23,7 +34,7 @@
     <header class="container-fluid">
         <div class="upper-jumbotron bg-secondary">
             <div class="float-left">
-                <p>Bienvenido, <?= $_SESSION['usuario']?></p>
+                <p>Bienvenido, <?= $_SESSION['nombre']?></p>
             </div>
             <div class="float-right super-link" >
                 <a href="../../../Gestion/logout.php"><i class="fas fa-sign-out-alt"></i> Salir</a>

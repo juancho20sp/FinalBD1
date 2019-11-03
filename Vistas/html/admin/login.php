@@ -5,9 +5,9 @@
     if(isset($_POST['usuario']) && isset($_POST['password'])){
         unset($_SESSION['usuario']); //Logout al usuario actual
         
-        $sql = "SELECT * FROM admins WHERE
-                 (email = :em OR username = :usr)
-                 AND password = :pas";
+        $sql = "SELECT * FROM usuarios  WHERE
+                 (Email = :em OR Username = :usr)
+                 AND Password = :pas";
          
          $stmt = $pdo->prepare($sql);
          $stmt -> execute(array(
