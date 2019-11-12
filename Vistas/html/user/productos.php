@@ -1,33 +1,10 @@
 <?php
     require_once "../../../Gestion/pdo.php";
-    session_start();
-    //require "../../../Gestion/userLogin.php";
 
-    if(isset($_POST['correo']) && isset($_POST['password'])){
-        unset($_SESSION['usuario']); //Logout al usuario actual
-        
-        $sql = "SELECT * FROM usuarios  WHERE
-                 (Email = :em OR Username = :usr)
-                 AND Password = :pas";
-         
-         $stmt = $pdo->prepare($sql);
-         $stmt -> execute(array(
-             ':em' => $_POST['correo'],
-             ':usr' => $_POST['correo'],
-             ':pas' => $_POST['password']
-         ));
- 
-         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
- 
-         if($row === false){
-             $_SESSION['error'] = 'Usuario o contraseña incorrecta.';
-             
-         } else {
-             $_SESSION['usuario'] = $_POST['usuario'];
-             
-         }
-     }
+    $sql = "SELECT * FROM producto";
+    $stmt = $pdo -> query($sql);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,8 +14,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
-    <link rel="stylesheet" href="../../html/user/css/indexStyle.css">
-    <title>Mi tienda</title>
+    <link rel="stylesheet" href="../../html/user/css/productsStyle.css">
+    <title>Productos</title>
 </head>
 <body class="super-container">
     <!--Empieza el modal-->
@@ -100,18 +77,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-center">
-                                            <?php
-                                                if (isset($_SESSION['error'])){
-                                                    echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
-                                                    unset($_SESSION["error"]);
-                                                }    
-
-                                                if (isset($_SESSION['success'])){
-                                                    echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
-                                                    unset($_SESSION["success"]);
-                                                }  
-                                            ?>
-                                                <button type="submit" class="btn btn-primary ml-1">Ingresar</button>
+                                                <button type="button" class="btn btn-primary ml-1">Ingresar</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-dismiss="modal">Cancelar</button>
                                             </div>
@@ -177,105 +143,78 @@
         <!--Navbar-->
 
         <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-            <a href="index.html" class="nav-link">La Tienda</a>
-            <button class="navbar-toggler" type="button" data-target="#navbarItems" aria-controls="navbarItems"
-                 aria-expanded="false" aria-label="Toggle navigation" data-toggle="collapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarItems">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="index.php">Inicio <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item active">
-                            <a class="nav-link" href="productos.php">Productos <span class="sr-only">(Products)</span></a>
-                    </li>
-                    <li class="nav-item active">
-                            <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Registros
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Pagos
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Por cobrar</a>
-                          <a class="dropdown-item" href="#">Por realizar</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
-                </ul>
-                <form class="form-inline m-auto my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart fa-lg"></i> <span class="sr-only">(cart)</span></a>
-                    </li>
-                    <p> | </p>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="profile.php"><i class="fas fa-user-circle fa-lg"></i><span class="sr-only">(profile)</span></a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+                <a href="index.html" class="nav-link">La Tienda</a>
+                <button class="navbar-toggler" type="button" data-target="#navbarItems" aria-controls="navbarItems"
+                     aria-expanded="false" aria-label="Toggle navigation" data-toggle="collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+    
+                <div class="collapse navbar-collapse" id="navbarItems">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="index.php">Inicio <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item active">
+                                <a class="nav-link" href="productos.php">Productos <span class="sr-only">(Products)</span></a>
+                        </li>
+                        <li class="nav-item active">
+                                <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Registros
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                              <a class="dropdown-item" href="#">Clientes</a>
+                              <a class="dropdown-item" href="#">Proveedores</a>
+                              <div class="dropdown-divider"></div>
+                              <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Pagos
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                              <a class="dropdown-item" href="#">Por cobrar</a>
+                              <a class="dropdown-item" href="#">Por realizar</a>
+                              <div class="dropdown-divider"></div>
+                              <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>
+                    </ul>
+                    <form class="form-inline m-auto my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart fa-lg"></i> <span class="sr-only">(cart)</span></a>
+                        </li>
+                        <p> | </p>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="profile.php"><i class="fas fa-user-circle fa-lg"></i><span class="sr-only">(profile)</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
     </header>
     
     <main>
         <div class="container">
-            <div class="bd-example">
-                <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
-                        <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
-                        <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
-                    </ol>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="../../public/img/bg1.jpg" class="d-block w-100" alt="...">
-                            <div class="carousel-caption d-none d-md-block" id="car1">
-                                <h5>Bienvenidos a nuestra tienda!</h5>
-                                <p>Nuestro propósito: servirte!</p>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <img src="../../public/img/bg2.jpg" class="d-block w-100" alt="...">
-                            <div class="carousel-caption d-none d-md-block" id="car2">
-                                <h5 class="">Nuestros productos</h5>
-                                <p>Siempre frescos, siempre buenos.</p>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <img src="../../public/img/bg3.jpg" class="d-block w-100" alt="...">
-                            <div class="carousel-caption d-none d-md-block" id="car3">
-                                <h5>Gracias por visitarnos!</h5>
-                                <p>Valoramos tu visita!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
-                       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                       <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
-                       <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                       <span class="sr-only">Next</span>
-                    </a>
-                   </div>
-                 </div>
+            <div class="row">
+            <!--Serán generados con PHP-->
+            <?php
+                while($producto = $stmt -> fetch(PDO::FETCH_ASSOC)){
+                    echo '<div class="card col-sm-3 text-center m-2">';
+                    echo '<img src="..." class="card-img-top" alt="...">';
+                    echo '<div class="card-body">';    
+                    echo '<h5 class="card-title">'.$producto['Nombre'].'</h5>';    
+                    echo '<a href="#" class="btn btn-primary">Añadir al carrito</a>';
+                    echo '</div></div>';                         
+                }
+            ?>
+            </div>
         </div>
     </main>
 

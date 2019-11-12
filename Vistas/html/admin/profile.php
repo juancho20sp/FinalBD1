@@ -9,11 +9,11 @@
 
     //Hacemos la edición
     if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'])){
-        $sql = "UPDATE admins SET nombre = :nombre,
-            apellidos = :apellidos,
-            email = :email,
-            password = :password
-            WHERE idAdmin = :idAdmin";
+        $sql = "UPDATE usuarios SET Nombre = :nombre,
+            Apellidos = :apellidos,
+            Email = :email,
+            Password = :password
+            WHERE idUsuarios = :idUsuarios";
 
         $stmt = $pdo -> prepare($sql);
         $stmt -> execute(array(
@@ -21,18 +21,18 @@
             ':apellidos' => $_POST['apellidos'],
             ':email' => $_POST['email'],
             ':password' => $_POST['password'],
-            ':idAdmin' => $_SESSION['usrId']
+            ':idUsuarios' => $_SESSION['usrId']
     ));
         $_SESSION['success'] = "Usuario actualizado correctamente";
     }
 
     //Traemos la información del usuario
-    $sql = "SELECT * FROM admins WHERE username = :usr";
+    $sql = "SELECT * FROM usuarios WHERE Username = :usr";
     $stmt = $pdo -> prepare($sql);
     $stmt->execute(array(":usr" => $_SESSION['usuario']));
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $_SESSION['usrId'] = $user['idAdmin'];
+    $_SESSION['usrId'] = $user['idUsuarios'];
 
     
 ?>
@@ -83,7 +83,7 @@
                           <a class="dropdown-item" href="#">Clientes</a>
                           <a class="dropdown-item" href="#">Proveedores</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
+                          <a class="dropdown-item" href="inventario.php">Inventario</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -122,7 +122,7 @@
                     <div class="aside bg-secondary">
                         <div class="text-center subprofile">
                             <img src="../../public/img/profile.png" alt="profile" width="250px" height="250px">
-                            <p><?= $user['nombre']?>  <?= $user['apellidos']?></p>
+                            <p><?= $user['Nombre']?>  <?= $user['Apellidos']?></p>
                             <p>Rol: Administrador</p>
                             <div class="row justify-content-center">
                                 <a href="../../../Gestion/logout.php" class=" col-4 btn btn-primary">Salir</a>
@@ -136,23 +136,23 @@
                             <form method="post">
                                 <div class="form-group">
                                     <label for="nombre">Nombre:</label>
-                                    <input name="nombre" type="text" class="form-control" id="nombre" value="<?= $user['nombre']?>">
+                                    <input name="nombre" type="text" class="form-control" id="nombre" value="<?= $user['Nombre']?>">
                                 </div>
                                 <div class="form-group">
                                     <label for="apellidos">Apellidos:</label>
-                                    <input name="apellidos" type="text" class="form-control" id="apellidos" value="<?= $user['apellidos']?>">
+                                    <input name="apellidos" type="text" class="form-control" id="apellidos" value="<?= $user['Apellidos']?>">
                                 </div>
                                 <div class="form-group">
                                     <label for="email">Email:</label>
-                                    <input name="email" type="text" class="form-control" id="email" value="<?= $user['email']?>">
+                                    <input name="email" type="text" class="form-control" id="email" value="<?= $user['Email']?>">
                                 </div>
                                 <div class="form-group">
                                     <label for="usuario">Usuario:</label>
-                                    <input name="usuario" type="text" class="form-control" id="usuario" value="<?= $user['username']?>" disabled>
+                                    <input name="usuario" type="text" class="form-control" id="usuario" value="<?= $user['Username']?>" disabled>
                                 </div>
                                 <div class="from-group" id="lower">
                                     <label for="password">Contraseña:</label>
-                                    <input name="password" type="password" class="form-control" id="password" placeholder="Ingrese su contraseña">
+                                    <input name="password" type="password" class="form-control" id="password" placeholder="Ingrese su contraseña" required>
                                 </div>
                                 <?php 
                                     if(isset($_SESSION['success'])){

@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
     <link rel="stylesheet" href="../admin/css/menuStyle.css">
-    <title>Inicio</title>
+    <title>Menú</title>
 </head>
 <body class="super-container">
     <header class="container-fluid">
@@ -53,7 +53,7 @@
                           <a class="dropdown-item" href="#">Clientes</a>
                           <a class="dropdown-item" href="#">Proveedores</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
+                          <a class="dropdown-item" href="inventario.php">Inventario</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -103,8 +103,18 @@
                         <div class="card-body">
                           <h5 class="card-title">Registrar</h5>
                           <p class="card-text">Para registrar los nuevos productos llegados a la tienda.</p>
-                          <a href="#" class="btn btn-primary">Vamos a registrar!</a>
+                          <a href="registrarproducto.php" class="btn btn-primary">Vamos a registrar!</a>
                         </div>
+                        <?php
+                            if (isset($_SESSION['success'])){
+                              echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
+                              unset($_SESSION["success"]);
+                            } 
+                            if (isset($_SESSION['error'])){
+                                echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
+                                unset($_SESSION["error"]);
+                            } 
+                        ?>
                       </div>
                     </div>
                     <div class="col-sm-6">
@@ -112,8 +122,18 @@
                           <div class="card-body">
                             <h5 class="card-title">Generar contrato</h5>
                             <p class="card-text">Para tomar los datos necesarios de su nuevo proveedor.</p>
-                            <a href="#" class="btn btn-primary">Registrar proveedor</a>
+                            <a href="./generarcontrato.php" class="btn btn-primary">Registrar proveedor</a>                            
                           </div>
+                          <?php
+                                if (isset($_SESSION['success'])){
+                                  echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
+                                  unset($_SESSION["success"]);
+                                } 
+                                if (isset($_SESSION['error'])){
+                                    echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
+                                    unset($_SESSION["error"]);
+                                } 
+                            ?>
                         </div>
                       </div>
                       <div class="col-sm-6">

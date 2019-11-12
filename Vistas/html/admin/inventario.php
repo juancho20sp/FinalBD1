@@ -8,56 +8,20 @@
     return;
 }
 
-//Delete option
-//For Admins
-  if(isset($_POST['delete']) && isset($_POST['idUsuarios'])){
-      $sql = "DELETE FROM usuarios WHERE idUsuarios = :zip";
-    
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute(array(
-          ':zip' => $_POST['idUsuarios']
-      ));
+//Añadir precio de venta
+    if(isset($_POST['precio'])){
+        $sql = "UPDATE producto SET Precio_Venta = :price WHERE idProducto = :id";
+        $stmt = $pdo->prepare($sql);
 
-      $_SESSION['success'] = "Administrador eliminado correctamente.";
-  }
+        $stmt -> execute(array(
+            ':price' => $_POST['precio'],
+            ':id' => $_POST['idProducto']
+        ));
 
-//For providers
-if(isset($_POST['deleteProvider']) && isset($_POST['idProveedor'])){
-    $sql = "DELETE FROM proveedor WHERE idProveedor = :zip";
-  
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(array(
-        ':zip' => $_POST['idProveedor']
-    ));
-
-    $_SESSION['success'] = "Proveedor eliminado correctamente.";
-}
-
-//Update Option
-if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'])){
-    $sql = "UPDATE usuarios SET Nombre = :nombre,
-        Apellidos = :apellidos,
-        Email = :email,
-        Password = :password
-        WHERE idUsuarios = :idUsuarios";
-
-    $stmt = $pdo -> prepare($sql);
-    $stmt -> execute(array(
-        ':nombre' => $_POST['nombre'],
-        ':apellidos' => $_POST['apellidos'],
-        ':email' => $_POST['email'],
-        ':password' => $_POST['password'],
-        ':idUsuarios' => $_SESSION['usrId']
-));
-    $_SESSION['success'] = "Usuario actualizado correctamente";
-}
-  $sql = "SELECT * FROM usuarios WHERE idUsuarios = :zip";
-  $stmt = $pdo -> prepare($sql);
-  $stmt -> execute(array(':zip' => $_POST['idUsuarios']));
-
-  $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-  
-
+        $_SESSION['success'] = 'Precio añadido correctamente.';
+    } else {
+        $_SESSION['error'] = 'Fallo al agregar el precio.';
+    }
 ?>
 
 <!DOCTYPE html>
@@ -69,15 +33,15 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
     <link rel="stylesheet" href="../../html/user/css/productsStyle.css">
-    <title>Panel de Control</title>
+    <title>Inventario</title>
 </head>
 <body class="super-container">
     <!--Empieza el modal-->
-    <div id="updateModal" class="modal fade" role="dialog">
+    <div id="priceModal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg" role="content">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>Editar usuario</h3>
+                        <h3>Precio de venta</h3>
                         <button class="close" type="button" data-dismiss="modal">
                             &times;
                         </button>
@@ -89,46 +53,16 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                                     <div class="tab-pane fade show active" role="tabpanel" id="inicio">
                                         <form>
                                           <div class="row">
-                                              <div class="form-group col-sm-6">
-                                                  <label for="nombre">Nombre:</label>
-                                                  <input name="nombre" type="text" class="form-control" id="nombre" value="<?= $row['Nombre'] ?>">
-                                              </div>
-                                              <div class="form-group col-sm-6">
-                                                  <label for="apellidos">Apellidos:</label>
-                                                  <input name="apellidos" type="text" class="form-control" id="apellidos" value="<?= $row['Apellidos'] ?>">
-                                              </div>                    
-                                          </div>
-                                          <div class="row">
-                                              <div class="form-group col-sm-6">
-                                                  <label for="Identificacion">Identificación:</label>
-                                                  <input name="Identificacion" type="text" class="form-control" id="Identificacion" value="<?= $row['Identificacion'] ?>">
-                                              </div>
-                                              <div class="form-group col-sm-6">
-                                                  <label for="Telefono">Teléfono:</label>
-                                                  <input name="Telefono" type="text" class="form-control" id="Telefono" value="<?= $row['Telefono'] ?>">
-                                              </div>                    
-                                          </div>
-                                          <div class="form-group">
-                                              <label for="email">Email:</label>
-                                              <input name="email" type="text" class="form-control" id="email" value="<?= $row['Email'] ?>">
-                                          </div>
-                                          <div class="form-group">
-                                              <label for="usuario">Usuario:</label>
-                                              <input name="usuario" type="text" class="form-control" id="usuario" value="<?= $row['Username'] ?>">
-                                          </div>
-                                          <div class="from-group" id="lower">
-                                              <label for="password">Contraseña:</label>
-                                              <input name="password" type="password" class="form-control" id="password" value="<?= $row['Password'] ?>">
-                                          </div>
-                                          <?php
-                                              if (isset($_SESSION['error'])){
-                                                  echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
-                                                  unset($_SESSION["error"]);
-                                              } 
-                                          ?>
-                      
-                                          <button type="submit" class="btn btn-primary ml-1">Actualizar</button>
+                                              <div class="form-group row">
+                                                  <label for="precio">Precio de Venta:</label>
+                                                  <input name="precio" type="number" class="form-control col-10" id="precio" placeholder="Ingrese el precio de venta">
+                                              </div>                                                                
+                                          </div>                                                           
+                                          <button type="submit" class="btn btn-primary ml-1">Agregar</button>
                                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>                                          
+                                          <?php
+                                            echo $_POST['idProducto'];
+                                          ?>
                                       </form>  
                                         
                                     </div>                                 
@@ -214,7 +148,7 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                 <div class="card-header" id="headingOne">
                   <h2 class="mb-0">
                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                      Administradores
+                      Productos
                     </button>
                   </h2>
                 </div>
@@ -226,36 +160,35 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                             <tr>
                                 <th scope="col">ID</th>
                                 <th scope="col">Nombre</th>
-                                <th scope="col">Apellidos</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Password</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Precio de Compra</th>
+                                <th scope="col">Precio de venta</th>
+                                <th scope="col">Existencias</th>
+                                <th scope="col">Action</th>                                  
                             </tr>
                         </thead>
                         <tbody>
                         <?php                            
-                            $stmt = $pdo -> query("SELECT * FROM usuarios WHERE isAdmin = 1");
+                            $stmt = $pdo -> query("SELECT * FROM producto");
                             while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
                                 echo "<tr>";
                                 echo "<th scope='row'>";
-                                echo ($row['idUsuarios']);
+                                echo ($row['idProducto']);
                                 echo "</th><td>";                                
                                 echo ($row['Nombre']);
                                 echo "</td><td>";                                
-                                echo ($row['Apellidos']);
-                                echo "</td><td>";                                
-                                echo ($row['Email']);
-                                echo "</td><td>";                                
-                                echo ($row['Username']);
-                                echo "</td><td>";
-                                echo ($row['Password']);
-                                echo "</td><td>";
+                                echo ($row['Precio_Compra']);
+                                echo "</td><td>";      
+                                echo ($row['Precio_Venta']);
+                                echo "</td><td>";                           
+                                echo ($row['Existencias']);
+                                echo "</td><td>";                                                              
                                 echo ('<form method="post"><input type="hidden" ');
-                                echo ('name="idUsuarios" value="'.$row['idUsuarios'].'">'."\n");                          
-                                echo ('<input type="submit" value="Delete" name="delete">');
-                                echo ("\n</form>\n");
-                                echo ("</td></tr>");                                
+                                echo ('name="idProducto" value="'.$row['idProducto'].'">'."\n");
+                                echo ('<a data-toggle="modal" data-target="#priceModal">'); 
+                                echo ('</a>');                          
+                                echo ('<input type="submit" value="Precio de venta" name="price">');
+                                echo ("\n</form>\n");                                
+                                echo ("</td></tr>");     
                             }
                         ?>
                         </tbody>

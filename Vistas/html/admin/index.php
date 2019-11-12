@@ -68,7 +68,7 @@
                           <a class="dropdown-item" href="#">Clientes</a>
                           <a class="dropdown-item" href="#">Proveedores</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
+                          <a class="dropdown-item" href="inventario.php">Inventario</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">

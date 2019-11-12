@@ -2,32 +2,26 @@
     require_once "../../../Gestion/pdo.php";
     session_start();
         
-    //Hacemos la edición
-    if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'])){
-        $sql = "UPDATE usuarios SET Nombre = :nombre,
-            Apellidos = :apellidos,
-            Email = :email,
-            Password = :password
-            WHERE idUsuarios = :idUsuarios";
+    if(!isset($_SESSION['usuario'])){
+        header("Location: login.php");
+        return;
+    }
+
+    //Registramos el proveedor
+    if(isset($_POST['nombre'])){
+        $sql = "INSERT INTO proveedor(Nombre)
+                VALUES (:nombre)";
 
         $stmt = $pdo -> prepare($sql);
         $stmt -> execute(array(
-            ':nombre' => $_POST['nombre'],
-            ':apellidos' => $_POST['apellidos'],
-            ':email' => $_POST['email'],
-            ':password' => $_POST['password'],
-            ':idUsuarios' => $_SESSION['usrId']
+            ':nombre' => $_POST['nombre']            
     ));
-        $_SESSION['success'] = "Usuario actualizado correctamente";
+        $_SESSION['success'] = "Proveedor actualizado correctamente";
+        header('Location: menu.php');
+        return;
+    } else {
+        //$_SESSION['error'] = "Fallo al registrar el proveedor";
     }
-
-    //Traemos la información del usuario
-    $sql = "SELECT * FROM usuarios WHERE username = :usr";
-    $stmt = $pdo -> prepare($sql);
-    $stmt->execute(array(":usr" => $_SESSION['usuario']));
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $_SESSION['usrId'] = $user['idUsuarios'];
 
     
 ?>
@@ -40,8 +34,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
-    <link rel="stylesheet" href="../admin/css/profileStyle.css">
-    <title>Inicio</title>
+    <link rel="stylesheet" href="../admin/css/generateStyle.css">
+    <title>Generar Contrato</title>
 </head>
 <body class="super-container">
     <header class="container-fluid">
@@ -59,22 +53,16 @@
 
         <!--Navbar-->
         <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-            <a href="index.html" class="nav-link">La Tienda</a>
+            <a href="../admin/index.php" class="nav-link">Mi tiendita</a>
             <button class="navbar-toggler" type="button" data-target="#navbarItems" aria-controls="navbarItems"
-                 aria-expanded="false" aria-label="Toggle navigation" data-toggle="collapse">
+                 aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarItems">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="index.php">Inicio <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item active">
-                            <a class="nav-link" href="productos.php">Productos <span class="sr-only">(Products)</span></a>
-                    </li>
-                    <li class="nav-item active">
-                            <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
+                        <a class="nav-link" href="menu.php">Menú <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -84,7 +72,7 @@
                           <a class="dropdown-item" href="#">Clientes</a>
                           <a class="dropdown-item" href="#">Proveedores</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
+                          <a class="dropdown-item" href="inventario.php">Innventario</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -105,7 +93,7 @@
                 </form>
                 <ul class="navbar-nav">
                     <li class="nav-item active">
-                        <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart fa-lg"></i> <span class="sr-only">(cart)</span></a>
+                        <a class="nav-link" href="controlpanel.php"><i class="fas fa-cogs fa-lg"></i><span class="sr-only">(cart)</span></a>
                     </li>
                     <p> | </p>
                     <li class="nav-item active">
@@ -119,52 +107,22 @@
     <main>
         <div class="container">
            <div class="row justify-content-center profile-container">
-               <aside class="col-md-4">
-                    <div class="aside bg-secondary">
-                        <div class="text-center subprofile">
-                            <img src="../../public/img/profile.png" alt="profile" width="250px" height="250px">
-                            <p><?= $user['nombre']?>  <?= $user['apellidos']?></p>
-                            <p>Rol: Administrador</p>
-                            <div class="row justify-content-center">
-                                <a href="../../../Gestion/logout.php" class=" col-4 btn btn-primary">Salir</a>
-                            </div>
-                        </div>
-                    </div>
-               </aside>
                <div class="col-md-8">
                     <div class="main bg-light">
-                        <div class="card2">
-                            <form method="post">
-                                <div class="form-group">
+                        <form method="post" class="field">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
                                     <label for="nombre">Nombre:</label>
-                                    <input name="nombre" type="text" class="form-control" id="nombre" value="<?= $user['nombre']?>">
+                                    <input name="nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese el nombre del Proveedor">
                                 </div>
-                                <div class="form-group">
-                                    <label for="apellidos">Apellidos:</label>
-                                    <input name="apellidos" type="text" class="form-control" id="apellidos" value="<?= $user['apellidos']?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email:</label>
-                                    <input name="email" type="text" class="form-control" id="email" value="<?= $user['email']?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="usuario">Usuario:</label>
-                                    <input name="usuario" type="text" class="form-control" id="usuario" value="<?= $user['username']?>" disabled>
-                                </div>
-                                <div class="from-group" id="lower">
-                                    <label for="password">Contraseña:</label>
-                                    <input name="password" type="password" class="form-control" id="password" placeholder="Ingrese su contraseña">
-                                </div>
-                                <?php 
-                                    if(isset($_SESSION['success'])){
-                                        echo '<p>'.$_SESSION['success'].'</p>';
-                                        unset($_SESSION['success']);
-                                    }
-                                ?>                                                             
-                                <button type="submit" class="btn btn-primary ml-1">Editar</button>
-                                <button type="button" class="btn btn-secondary">Cancelar</button>                                
-                            </form>
-                        </div>
+                            </div>                         
+
+                            <div>
+                                <button type="submit" class="btn btn-primary ml-1">Registrar</button>
+                                <button type="reset" class="btn btn-secondary">Cancelar</button>
+                                <a href="menu.php">Volver</a>
+                            </div>
+                        </form>
                     </div>
                </div>
            </div>
