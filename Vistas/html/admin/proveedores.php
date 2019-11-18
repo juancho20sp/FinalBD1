@@ -1,10 +1,24 @@
 <?php
-  session_start();
-    
+  require_once "../../../Gestion/pdo.php";
+  session_start();  
+  
+
   if(! isset($_SESSION['usuario'])){
     header("Location: login.php");
     return;
-  }
+}
+
+//Eliminar Proveedor
+    if(isset($_POST['deleteProvider']) && isset($_POST['idProveedor'])){
+        $sql = "DELETE FROM proveedor WHERE idProveedor = :zip";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array(
+            ':zip' => $_POST['idProveedor']
+        ));
+
+        $_SESSION['success'] = "Proveedor eliminado correctamente.";
+    }
 ?>
 
 <!DOCTYPE html>
@@ -15,14 +29,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
-    <link rel="stylesheet" href="css/menuStyle.css">
-    <title>Menú</title>
+    <link rel="stylesheet" href="css/providerStyle.css">
+    <title>Proveedores</title>
 </head>
 <body class="super-container">
-    <header class="container-fluid">
+<header class="container-fluid">
         <div class="upper-jumbotron bg-secondary">
             <div class="float-right super-link" >
-                <a href="../../../Gestion/logout.php"><i class="fas fa-sign-out-alt"></i> Salir</a>
+              <a href="../../../Gestion/logout.php"><i class="fas fa-sign-out-alt"></i> Salir</a>
             </div>
         </div>
         <div class="jumbotron">
@@ -33,8 +47,9 @@
         </div>
 
         <!--Navbar-->
+                                              
         <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-            <a href="../admin/index.php" class="nav-link">Mi tiendita</a>
+            <a href="index.php" class="nav-link">Mi tiendita</a>
             <button class="navbar-toggler" type="button" data-target="#navbarItems" aria-controls="navbarItems"
                  aria-expanded="false" aria-label="Toggle navigation" data-toggle="collapse">
                 <span class="navbar-toggler-icon"></span>
@@ -84,62 +99,49 @@
             </div>
         </nav>
     </header>
-    
     <main>
-        <div class="container">
-            <div class="row" id="cards">
-                <div class="row">
-                    <div class="col-sm-6">
-                      <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Comprar</h5>
-                          <p class="card-text">Para realizar la compra de productos.</p>
-                          <a href="comprar.php" class="btn btn-primary">Vamos a comprar!</a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-sm-6">
-                      <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Registrar</h5>
-                          <p class="card-text">Para registrar los nuevos productos de la tienda.</p>
-                          <a href="registrarproducto.php" class="btn btn-primary">Vamos a registrar!</a>
-                        </div>
-                        <?php
-                            if (isset($_SESSION['success'])){
-                              echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
-                              unset($_SESSION["success"]);
-                            }                             
-                        ?>
-                      </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="card">
-                          <div class="card-body">
-                            <h5 class="card-title">Generar contrato</h5>
-                            <p class="card-text">Para tomar los datos necesarios de su nuevo proveedor.</p>
-                            <a href="./generarcontrato.php" class="btn btn-primary">Registrar proveedor</a>                            
-                          </div>
-                          <?php
-                                if (isset($_SESSION['success'])){
-                                  echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
-                                  unset($_SESSION["success"]);
-                                }                                
-                            ?>
-                        </div>
-                      </div>
-                      <div class="col-sm-6">
-                        <div class="card">
-                          <div class="card-body">
-                            <h5 class="card-title">Special title treatment</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php                            
+                    $stmt = $pdo -> query("SELECT * FROM proveedor");
+                    while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                        echo "<tr>";
+                        echo "<th scope='row'>";
+                        echo ($row['idProveedor']);
+                        echo "</th><td>";                                
+                        echo ($row['Nombre']);
+                        echo "</td><td>";                             
+                        echo ('<form method="post"><input type="hidden" ');
+                        echo ('name="idProveedor" value="'.$row['idProveedor'].'">'."\n");                          
+                        echo ('<input type="submit" value="Delete" name="deleteProvider">');
+                        echo ("\n</form>\n");
+                        echo ("</td></tr>");                                
+                    }
+                ?>
+                </tbody>
+            </table>
+                <?php
+                    if (isset($_SESSION['error'])){
+                        echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
+                        unset($_SESSION["error"]);
+                    }    
+                    
+                    if (isset($_SESSION['success'])){
+                        echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
+                        unset($_SESSION["success"]);
+                    }  
+                ?>     
+            </div>        
         </div>
+    
     </main>
 
     <footer class="bg-secondary">

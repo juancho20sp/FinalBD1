@@ -7,62 +7,97 @@
         return;
     }
 
-    //Traemos todos los proveedores
-    $stmt = $pdo -> query("SELECT * FROM proveedor");
-    
-    //Registramos el producto
-    //Tabla Producto
-    if(isset($_POST['select']) && isset($_POST['nombre']) 
-        && isset($_POST['precio'])){
-        //$sql = "INSERT INTO producto (Nombre, Precio_Compra, Existencias)
-          //  VALUES (:nombre, :precio, :cantidad)";
+    //Recalculamos el precio en caso de modificaciones
+    if(isset($_POST['calcular'])){
+        $_SESSION['cantidadProducto'] = $_POST['cantidad'];
+    }
 
-        $sql = "INSERT INTO producto (Nombre, Precio_Compra)
-                    VALUES (:nombre, :precio)";
-        $stmt = $pdo -> prepare($sql);
-        $stmt -> execute(array(
-            ':nombre' => $_POST['nombre'],
-            ':precio' => $_POST['precio']
-        ));
-        
-        //-------------------------------------------------------------
+    //Montamos la fecha actual
+    $date = date('Y-m-d H:i:s');
 
-        //id de proveedor
-        $sqlProveedor = "SELECT * FROM proveedor WHERE Nombre = :name";
+
+    //Traemos el proveedor del producto
+        $sqlProveedor = "SELECT proveedor.idProveedor
+                    FROM ((proveedor
+                    INNER JOIN proveedor_producto
+                    ON proveedor.idProveedor = proveedor_producto.idProveedor)
+                    INNER JOIN producto
+                    ON producto.idProducto = proveedor_producto.idProducto)
+                    WHERE producto.idProducto = :idProducto";
+
         $stmtProveedor = $pdo -> prepare($sqlProveedor);
         $stmtProveedor -> execute(array(
-            ':name' => $_POST['select']
+            ":idProducto" => $_SESSION['idProducto']
         ));
 
         $proveedor = $stmtProveedor -> fetch(PDO::FETCH_ASSOC);
-        $idProveedor = $proveedor['idProveedor'];
+        $proveedor = $proveedor['idProveedor'];
+    //--------------------------------------
 
-        //id de producto
-        $sqlProducto = "SELECT * FROM producto WHERE Nombre = :name";
-        $stmtProducto = $pdo -> prepare($sqlProducto);
-        $stmtProducto -> execute(array(
-            ':name' =>$_POST['nombre']
+    if(isset($_POST['pagar'])){
+       //Llenamos la tabla compra
+
+        $sql = "INSERT INTO compra (Proveedor, Producto, Fecha) 
+                VALUES (:proveedor, :producto, :fecha)";
+        $stmt = $pdo -> prepare($sql);
+        $stmt -> execute(array(
+            ':proveedor' => $proveedor,
+            ':producto' => $_SESSION['idProducto'],
+            ':fecha' => $date
+        ));
+        //-------------------------------------------
+
+        //Traemos el id de esta compra
+        $sqlId = $pdo -> query("SELECT idCompra FROM compra ORDER BY idCompra DESC LIMIT 1");
+        $rowId = $sqlId -> fetch(PDO::FETCH_ASSOC);
+        $idCompra = $rowId['idCompra'];
+        //------------------------------------------
+
+        //Llenamos la tabla compra_producto
+        $sql2 = "INSERT INTO compra_producto (idCompra, idProducto,
+                    Cantidad, Precio_Unitario) VALUES (:idCompra,
+                        :idProducto, :cantidad, :precio)";
+
+        $stmt2 = $pdo -> prepare($sql2);
+        $stmt2 -> execute(array(
+            ":idCompra" => $idCompra,
+            ":idProducto" => $_SESSION['idProducto'],
+            ":cantidad" => $_SESSION['cantidadProducto'],
+            ":precio" => $_SESSION['precioProducto']
+        ));
+        //----------------------------------------
+
+        //Traemos las existencias actuales
+        $existenciasPasadas = $pdo -> query("SELECT Existencias FROM producto WHERE idProducto = {$_SESSION['idProducto']}");
+        $rowEx = $existenciasPasadas -> fetch(PDO::FETCH_ASSOC);
+        $existencias = $rowEx['Existencias'];
+        //---------------------------------------
+
+        //Modificamos existencias en producto
+        $sql3 = "UPDATE producto SET Existencias = :existencias
+                    WHERE idProducto = :idProducto";
+        $stmt3 = $pdo -> prepare($sql3);
+        $stmt3 -> execute(array(
+            ":existencias" => ($existencias + $_SESSION['cantidadProducto']) ,
+            ":idProducto" => $_SESSION['idProducto']
         ));
 
-        $producto = $stmtProducto -> fetch(PDO::FETCH_ASSOC);
-        $idProducto = $producto['idProducto'];
-        
-        //-------------------------------------------------------------
+        //Unnset a los elementos de la sesión
+        unset($_SESSION['idProducto']);
+        unset($_SESSION['cantidadProducto']);
+        unset($_SESSION['precioProducto']);
+        unset($_SESSION['nombreProducto']);
 
-        //Llenamos la tabla derivada
-        $finalsql = "INSERT INTO proveedor_producto (idProveedor, idProducto) VALUES (:proveedor, :producto)";
-        $stmtFinal = $pdo -> prepare($finalsql);
-        $stmtFinal -> execute(array(
-            ':proveedor' => $idProveedor,
-            ':producto' => $idProducto
-        ));
+        $_SESSION['success'] = "Compra exitosa";
 
-        //--------------------------------------------------------------
-
-        $_SESSION['success'] = 'Producto registrado exitosamente.';
         header("Location: menu.php");
         return;
-    }    
+
+    }
+    
+
+    
+
 ?>
 
 <!DOCTYPE html>
@@ -74,7 +109,7 @@
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
     <link rel="stylesheet" href="../admin/css/generateStyle.css">
-    <title>Registrar Producto</title>
+    <title>Finaliza tu compra!</title>
 </head>
 <body class="super-container">
     <header class="container-fluid">
@@ -144,48 +179,43 @@
     </header>
     
     <main>
-        <div class="container">
+         <div class="container">
            <div class="row justify-content-center profile-container">
                <div class="col-md-8">
                     <div class="main bg-light">
                         <form method="post" class="field">
                             <div class="row">
                                 <div class="form-group col-sm-6">
-                                    <label for="proveedor">Seleccione un proveedor:</label>
-                                    <select class="borwser-default custom-select" name="select">
-                                        <option>Seleccione una opción:</option>
-                                        <?php
-                                            while($proveedor = $stmt->fetch(PDO::FETCH_ASSOC)){
-                                                echo '<option value="'.$proveedor['Nombre'].'">';
-                                                echo $proveedor['Nombre'];
-                                                echo '</option>';
-                                            }
-                                        ?>
-                                    </select>
-                                    <!--<?php
-                                        echo $idProveedor;
-                                    ?>-->                                    
-                                </div>
+                                    <label for="producto">Producto:</label>
+                                    <input name="producto" class="form-control" id="producto" value="<?= $_SESSION['nombreProducto']?>" readonly>
+                                </div>                                                                              
                                 <div class="form-group col-sm-6">
-                                    <label for="nombre">Nombre:</label>
-                                    <input name="nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese el nombre del Producto">
-                                </div>
+                                    <label for="precio">Precio de Compra (unidad):</label>
+                                    <input name="precio" type="number" class="form-control" id="precio" min="0" value="<?= $_SESSION['precioProducto']?>" readonly>
+                                </div>                                
                             </div>
                             <div class="row">
                                 <div class="form-group col-sm-6">
-                                    <label for="precio">Precio de Compra (unidad):</label>
-                                    <input name="precio" type="number" class="form-control" id="precio" min="0" placeholder="Ingrese el precio unitario de compra">
-                                </div>
-                                <!--<div class="form-group col-sm-6">
                                     <label for="cantidad">Cantidad:</label>
-                                    <input name="cantidad" type="number" class="form-control" id="cantidad" min="0" placeholder="Ingrese la cantidad">
-                                </div>-->
-                            </div>                                                   
+                                    <input name="cantidad" class="form-control" id="cantidad" value="<?= $_SESSION['cantidadProducto']?>">
+                                </div>                                                                              
+                                <div class="form-group col-sm-6 align-self-end">                                    
+                                    <button class="btn bg-primary text-light" type="submit" name="calcular">Calcular valor</button>
+                                </div>  
+                            </div>
+                                
+                            <div id="finalPrice" class="border-top mb-4">
+                                <h4>Total a pagar:</h4>
+                                <p>$ <?= $_SESSION['cantidadProducto'] * $_SESSION['precioProducto']?></p>
+
+                            </div>
+
+                                                                                  
 
                             <div>
-                                <button type="submit" class="btn btn-primary ml-1">Registrar</button>
+                                <button type="submit" class="btn btn-primary ml-1" name="pagar">Comprar</button>
                                 <button type="reset" class="btn btn-secondary">Cancelar</button>
-                                <a href="menu.php">Volver</a>
+                                <a href="comprar.php">Volver</a>
                             </div>
                         </form>
                     </div>

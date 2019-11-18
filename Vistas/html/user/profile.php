@@ -2,6 +2,11 @@
     require_once "../../../Gestion/pdo.php";
     session_start();
         
+    if(!isset($_SESSION['usuario'])){
+        //header("Location: login.php");
+       // return;
+    }
+
     //Hacemos la edición
     if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'])){
         $sql = "UPDATE usuarios SET Nombre = :nombre,
@@ -22,7 +27,7 @@
     }
 
     //Traemos la información del usuario
-    $sql = "SELECT * FROM usuarios WHERE username = :usr";
+    $sql = "SELECT * FROM usuarios WHERE Username = :usr";
     $stmt = $pdo -> prepare($sql);
     $stmt->execute(array(":usr" => $_SESSION['usuario']));
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -75,29 +80,7 @@
                     </li>
                     <li class="nav-item active">
                             <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Registros
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Pagos
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Por cobrar</a>
-                          <a class="dropdown-item" href="#">Por realizar</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
+                    </li>                    
                 </ul>
                 <form class="form-inline m-auto my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -124,7 +107,7 @@
                         <div class="text-center subprofile">
                             <img src="../../public/img/profile.png" alt="profile" width="250px" height="250px">
                             <p><?= $user['nombre']?>  <?= $user['apellidos']?></p>
-                            <p>Rol: Administrador</p>
+                            <p>Rol: Cliente</p>
                             <div class="row justify-content-center">
                                 <a href="../../../Gestion/logout.php" class=" col-4 btn btn-primary">Salir</a>
                             </div>

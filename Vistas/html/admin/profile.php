@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
     <link rel="stylesheet" href="../admin/css/profileStyle.css">
-    <title>Inicio</title>
+    <title>Perfil</title>
 </head>
 <body class="super-container">
     <header class="container-fluid">
@@ -80,8 +80,8 @@
                             Registros
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
+                          <a class="dropdown-item" href="clientes.php">Clientes</a>
+                          <a class="dropdown-item" href="proveedores.php">Proveedores</a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" href="inventario.php">Inventario</a>
                         </div>

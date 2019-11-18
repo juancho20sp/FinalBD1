@@ -1,7 +1,7 @@
 <?php
   require_once "../../../Gestion/pdo.php";
   session_start();  
-  
+
 
   if(! isset($_SESSION['usuario'])){
     header("Location: login.php");
@@ -34,30 +34,62 @@ if(isset($_POST['deleteProvider']) && isset($_POST['idProveedor'])){
 }
 
 //Update Option
-if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'])){
-    $sql = "UPDATE usuarios SET Nombre = :nombre,
+if(isset($_POST['codigo'])){
+    $_SESSION['codigoUsuario'] = $_POST['codigo'];   
+}
+
+if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'])
+            && isset($_POST['Identificacion'])){
+    $sql = "UPDATE usuarios SET Identificacion = :id,
+        Nombre = :nombre,
         Apellidos = :apellidos,
+        Username = :username,
         Email = :email,
-        Password = :password
+        Password = :password,
+        Telefono = :tel,
         WHERE idUsuarios = :idUsuarios";
 
     $stmt = $pdo -> prepare($sql);
     $stmt -> execute(array(
+        ':id' => $_POST['Identificacion'],
         ':nombre' => $_POST['nombre'],
         ':apellidos' => $_POST['apellidos'],
+        ':username' => $_POST['usuario'],
         ':email' => $_POST['email'],
         ':password' => $_POST['password'],
-        ':idUsuarios' => $_SESSION['usrId']
+        ':tel' => $_POST['Telefono'],
+        ':idUsuarios' => $_SESSION['codigoUsuario']
 ));
     $_SESSION['success'] = "Usuario actualizado correctamente";
 }
-  $sql = "SELECT * FROM usuarios WHERE idUsuarios = :zip";
-  $stmt = $pdo -> prepare($sql);
-  $stmt -> execute(array(':zip' => $_POST['idUsuarios']));
+    $sql = "SELECT * FROM usuarios WHERE idUsuarios = :zip";
+    $stmt = $pdo -> prepare($sql);
+    $stmt -> execute(array(':zip' => $_SESSION['codigoUsuario']));   
+    $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+    
+    //-------------------------------
 
-  $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-  
+    //Proveedores
+    if(isset($_POST['codigoP'])){
+        $_SESSION['codigoProveedor'] = $_POST['codigoP']; 
+    }
 
+    if(isset($_POST['nombreP'])){
+        $sql = "UPDATE proveedor SET Nombre = :nombre
+            WHERE idProveedor = :idProveedor";
+    
+        $stmt = $pdo -> prepare($sql);
+        $stmt -> execute(array(
+            ':nombre' => $_POST['nombreP'],            
+            ':idProveedor' => $_SESSION['codigoProveedor']
+    ));
+        $_SESSION['success'] = "Proveedor actualizado correctamente";
+    }
+
+    $sql2 = "SELECT * FROM proveedor WHERE idProveedor = :zip";
+    $stmt2 = $pdo -> prepare($sql2);
+    $stmt2 -> execute(array(':zip' => $_SESSION['codigoProveedor']));   
+    $row2 = $stmt2 -> fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -72,6 +104,72 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
     <title>Panel de Control</title>
 </head>
 <body class="super-container">
+    <!--Empieza el modal de inserción de id-->
+    <div id="idModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg" role="content">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Editar usuario</h3>
+                        <button class="close" type="button" data-dismiss="modal">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <main class="container">                            
+                            <div class="row">
+                                <div class="tab-content col-lg-9 offset-lg-2">
+                                    <div class="tab-pane fade show active" role="tabpanel" id="inicio">
+                                        <form method="post">
+                                          <div class="row">
+                                              <div class="form-group row">
+                                                  <label for="codigo">Código del usuario:</label>
+                                                  <input name="codigo" type="number" class="form-control col-10" id="codigo" placeholder="Ingrese el código" required>
+                                              </div>                                                              
+                                          </div>                                                           
+                                          <button type="submit" class="btn btn-primary ml-1"><a data-toggle="modal" data-target="#updateModal" data-dismiss="modal" id="link">Editar</a></button>                                          
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>                                          
+                                      </form>                                         
+                                    </div>                                 
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--Acaba del modal-->
+    <!--Empieza el modal de inserción de id proveedor-->
+    <div id="providerId" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg" role="content">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Editar Proveedor</h3>
+                        <button class="close" type="button" data-dismiss="modal">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <main class="container">                            
+                            <div class="row">
+                                <div class="tab-content col-lg-9 offset-lg-2">
+                                    <div class="tab-pane fade show active" role="tabpanel" id="inicio">
+                                        <form method="post">
+                                          <div class="row">
+                                              <div class="form-group row">
+                                                  <label for="codigoP">Código del Proveedor:</label>
+                                                  <input name="codigoP" type="number" class="form-control col-10" id="codigoP" placeholder="Ingrese el código" required>
+                                              </div>                                                              
+                                          </div>                                                           
+                                          <button type="submit" class="btn btn-primary ml-1"><a data-toggle="modal" data-target="#updateProviderModal" data-dismiss="modal">Editar</a></button>                                          
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>                                          
+                                      </form>                                         
+                                    </div>                                 
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--Acaba del modal-->
     <!--Empieza el modal-->
     <div id="updateModal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg" role="content">
@@ -87,8 +185,8 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                             <div class="row">
                                 <div class="tab-content col-lg-9 offset-lg-2">
                                     <div class="tab-pane fade show active" role="tabpanel" id="inicio">
-                                        <form>
-                                          <div class="row">
+                                        <form method="post">                                        
+                                          <div class="row">                                          
                                               <div class="form-group col-sm-6">
                                                   <label for="nombre">Nombre:</label>
                                                   <input name="nombre" type="text" class="form-control" id="nombre" value="<?= $row['Nombre'] ?>">
@@ -119,13 +217,43 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                                           <div class="from-group" id="lower">
                                               <label for="password">Contraseña:</label>
                                               <input name="password" type="password" class="form-control" id="password" value="<?= $row['Password'] ?>">
-                                          </div>
-                                          <?php
-                                              if (isset($_SESSION['error'])){
-                                                  echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
-                                                  unset($_SESSION["error"]);
-                                              } 
-                                          ?>
+                                          </div>                                         
+                      
+                                          <button type="submit" class="btn btn-primary ml-1">Actualizar</button>
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>                                          
+                                      </form>  
+                                        
+                                    </div>                                 
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!--Acaba del modal-->
+    <!--Modal Proveedor-->
+    <div id="updateProviderModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg" role="content">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Editar Proveedor</h3>
+                        <button class="close" type="button" data-dismiss="modal">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <main class="container">                            
+                            <div class="row">
+                                <div class="tab-content col-lg-9 offset-lg-2">
+                                    <div class="tab-pane fade show active" role="tabpanel" id="inicio">
+                                        <form method="post">                                        
+                                          <div class="row">                                          
+                                              <div class="form-group col-sm-6">
+                                                  <label for="nombreP">Nombre:</label>
+                                                  <input name="nombreP" type="text" class="form-control" id="nombreP" value="<?= $row2['Nombre'] ?>">
+                                              </div>                                                                
+                                          </div>                                                                                 
                       
                                           <button type="submit" class="btn btn-primary ml-1">Actualizar</button>
                                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>                                          
@@ -172,8 +300,8 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                             Registros
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
+                          <a class="dropdown-item" href="clientes.php">Clientes</a>
+                          <a class="dropdown-item" href="proveedores.php">Proveedores</a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" href="inventario.php">Inventario</a>
                         </div>
@@ -221,7 +349,7 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                 <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                   <div class="card-body">
                     <!--INSERTAR TABLA PHP-->
-                    <table class="table table-stripped">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th scope="col">ID</th>
@@ -285,7 +413,7 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
               <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
                 <div class="card-body">
                 <!--INSERTAR TABLA PHP-->
-                <table class="table table-stripped">
+                <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th scope="col">ID</th>
@@ -328,10 +456,10 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                                 echo ('<input type="submit" value="Delete" name="delete">');
                                 echo ("\n</form>\n");
                                 echo "</td><td>";
-                                echo ('<a data-toggle="modal" data-target="#updateModal">');
+                                echo ('<a data-toggle="modal" data-target="#idModal">');
                                 echo ('<form method="post"><input type="hidden" ');
                                 echo ('name="idUsuarios" value="'.$row['idUsuarios'].'">'."\n");                          
-                                echo ('<input type="submit" value="Edit" name="edit">');
+                                echo ('<input type="button" value="Edit" name="edit">');
                                 echo ("\n</form>\n");                        
                                 echo ('</a>');                                
                                 echo ("</td></tr>");                                
@@ -364,7 +492,7 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
               <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
                 <div class="card-body">
                    <!--INSERTAR TABLA PHP-->
-                   <table class="table table-stripped">
+                   <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th scope="col">ID</th>
@@ -386,7 +514,15 @@ if(isset($_POST['nombre']) && isset($_POST['apellidos']) && isset($_POST['email'
                                 echo ('name="idProveedor" value="'.$row['idProveedor'].'">'."\n");                          
                                 echo ('<input type="submit" value="Delete" name="deleteProvider">');
                                 echo ("\n</form>\n");
-                                echo ("</td></tr>");                                
+                                echo "</td><td>"; 
+                                echo ('<a data-toggle="modal" data-target="#providerId">');
+                                echo ('<form method="post"><input type="hidden" ');
+                                echo ('name="idProveedor" value="'.$row['idProveedor'].'">'."\n");                          
+                                echo ('<input type="button" value="Edit" name="edit">');
+                                echo ("\n</form>\n");                        
+                                echo ('</a>');                              
+                                echo ("</td></tr>");
+                                                                
                             }
                         ?>
                         </tbody>

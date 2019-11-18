@@ -7,22 +7,31 @@
         return;
     }
 
-    //Traemos los proveedores
-    if(isset($_POST['nombre'])){
-        $sql = "INSERT INTO proveedor(Nombre)
-                VALUES (:nombre)";
+    //Traemos los productos
+        $stmt = $pdo -> query("SELECT * FROM producto");
 
-        $stmt = $pdo -> prepare($sql);
-        $stmt -> execute(array(
-            ':nombre' => $_POST['nombre']            
-    ));
-        $_SESSION['success'] = "Proveedor actualizado correctamente";
-        header('Location: menu.php');
-        return;
-    } else {
-        //$_SESSION['error'] = "Fallo al registrar el proveedor";
+    //Capturamos el ID del producto seleccionado
+    if(isset($_POST['productoSelect']) && isset($_POST['rellenar'])){
+        $sqlProducto = "SELECT * FROM producto WHERE Nombre = :nombre";
+        $stmtProducto = $pdo -> prepare($sqlProducto);
+        $stmtProducto -> execute(array(
+            ":nombre" => $_POST['productoSelect']
+        ));
+
+        $producto = $stmtProducto -> fetch(PDO::FETCH_ASSOC);
+        $idProducto = $producto['idProducto'];
+
+        $_SESSION['nombreProducto'] = $_POST['productoSelect'];
+        $_SESSION['precioProducto'] = $producto['Precio_Compra'];
+        $_SESSION['idProducto'] = $idProducto;
     }
 
+    //Dejamos los datos finales en la sesión para la factura
+    if(isset($_POST['precio']) && isset($_POST['pagar']) && ($_POST['cantidad'] != 0)){
+        $_SESSION['cantidadProducto'] = $_POST['cantidad'];
+        header("Location: payment.php");
+        return;
+    }
     
 ?>
 
@@ -69,8 +78,8 @@
                             Registros
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
+                          <a class="dropdown-item" href="clientes.php">Clientes</a>
+                          <a class="dropdown-item" href="proveedores.php">Proveedores</a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" href="inventario.php">Inventario</a>
                         </div>
@@ -105,22 +114,50 @@
     </header>
     
     <main>
-        <div class="container">
+         <div class="container">
            <div class="row justify-content-center profile-container">
                <div class="col-md-8">
                     <div class="main bg-light">
                         <form method="post" class="field">
                             <div class="row">
                                 <div class="form-group col-sm-6">
-                                    <label for="nombre">Nombre:</label>
-                                    <input name="nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese el nombre del Proveedor">
+                                    <label for="proveedor">Seleccione un Producto:</label>
+                                    <select class="browser-default custom-select" name="productoSelect">
+                                        <option>Seleccione una opción:</option>
+                                        <?php                                            
+                                            while($producto = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                                echo '<option value="'.$producto['Nombre'].'">';
+                                                echo $producto['Nombre'];
+                                                echo '</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                    <?php
+                                        if(isset($_SESSION['nombreProducto'])){
+                                            echo $_SESSION['nombreProducto'];
+                                        }
+                                    ?>                                   
                                 </div>
-                            </div>                         
+                                <div class="form-group col-sm-6">
+                                    <label for="cantidad">Cantidad:</label>
+                                    <input name="cantidad" type="number" class="form-control" id="cantidad" min="0" placeholder="Ingrese la cantidad">
+                                </div>
+                            </div>
+                            <div class="row offset-sm-2">
+                                <button type="submit" class="btn bg-primary text-light" name="rellenar" id="link">Rellenar campos</button>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label for="precio">Precio de Compra (unidad):</label>
+                                    <input name="precio" type="number" class="form-control" id="precio" min="0" value="<?= $_SESSION['precioProducto']?>" readonly>
+                                </div>
+                                
+                            </div>                                                   
 
                             <div>
-                                <button type="submit" class="btn btn-primary ml-1">Registrar</button>
-                                <button type="button" class="btn btn-secondary">Cancelar</button>
-                                <a href="login.php">Volver</a>
+                                <button type="submit" class="btn btn-primary ml-1" name="pagar">Generar factura</button>
+                                <button type="reset" class="btn btn-secondary">Cancelar</button>
+                                <a href="menu.php">Volver</a>
                             </div>
                         </form>
                     </div>

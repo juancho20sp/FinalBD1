@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
     <link rel="stylesheet" href="../admin/css/signinStyle.css">
-    <title>Admin Login</title>
+    <title>Registrar administrador</title>
 </head>
 <body class="super-container">
     <header class="container-fluid">

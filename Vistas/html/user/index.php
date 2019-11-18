@@ -1,8 +1,8 @@
 <?php
     require_once "../../../Gestion/pdo.php";
     session_start();
-    //require "../../../Gestion/userLogin.php";
 
+    //Iniciar sesión
     if(isset($_POST['correo']) && isset($_POST['password'])){
         unset($_SESSION['usuario']); //Logout al usuario actual
         
@@ -27,6 +27,28 @@
              
          }
      }
+
+     //Registrar Usuario
+     if(isset($_POST['correo']) && isset($_POST['password'])){
+
+        $sql = "INSERT INTO  usuarios (Identificacion, Nombre, Apellidos, Username,
+                Email, Password, Telefono, isAdmin) 
+                VALUES ( '-', :name, :lastname, '-', :email, :pwd, '-', FALSE)";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt -> execute(array(
+            ':name' => $_POST['nombre'],
+            ':lastname' => $_POST['apellidos'],
+            ':email' => $_POST['email'],
+            ':pwd' => $_POST['password'],
+        ));
+
+        $_SESSION['success'] = "Usuario registrado correctamente.";
+        header('Location: index.php');
+        return;
+    } else {
+        $_SESSION['error'] = "Datos incompletos.";
+    }
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +95,7 @@
                             <div class="row">
                                 <div class="tab-content col-lg-9 offset-lg-2">
                                     <div class="tab-pane fade show active" role="tabpanel" id="inicio">
-                                        <form>
+                                        <form method="post">
                                             <div class="col-12">
                                                 <div class="form-group row">
                                                     <label for="correo" class="col-md-4 col-form-label">Email:</label>
@@ -123,6 +145,20 @@
                                         <form>
                                             <div class="col-12">
                                                 <div class="form-group row">
+                                                    <label for="nombre" class="col-md-4 col-form-label">Nombre:</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" name="nombre" id="nombre"
+                                                            placeholder="Nombre">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="apellidos" class="col-md-4 col-form-label">Apellidos:</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" name="apellidos" id="apellidos"
+                                                            placeholder="Apellidos">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
                                                     <label for="correo" class="col-md-4 col-form-label">Email:</label>
                                                     <div class="col-md-8">
                                                         <input type="email" class="form-control" name="correo" id="correo"
@@ -147,7 +183,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-center">
-                                                <button type="button" class="btn btn-primary ml-1">Regístrate</button>
+                                                <button type="submit" class="btn btn-primary ml-1">Regístrate</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-dismiss="modal">Cancelar</button>                                                
                                             </div>
@@ -193,29 +229,7 @@
                     </li>
                     <li class="nav-item active">
                             <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Registros
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Pagos
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Por cobrar</a>
-                          <a class="dropdown-item" href="#">Por realizar</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
+                    </li>                    
                 </ul>
                 <form class="form-inline m-auto my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">

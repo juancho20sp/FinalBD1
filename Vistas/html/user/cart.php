@@ -1,3 +1,46 @@
+<?php
+    require_once "../../../Gestion/pdo.php";
+    session_start();
+
+    //Delete method
+    if(isset($_POST['delete']) && isset($_POST['idProducto'])){
+        $sql = "DELETE FROM carrito WHERE idProducto = :zip";
+      
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array(
+            ':zip' => $_POST['idProducto']
+        )); 
+
+        $_SESSION['success'] = 'Producto eliminado correctamente';
+    }
+
+    //Update method
+    if(isset($_POST['update']) && isset($_POST['idProducto'])){
+        $sql = "UPDATE carrito SET Cantidad = :cantidad WHERE idProducto = :id";
+        $stmt = $pdo -> prepare($sql);
+        $stmt -> execute(array(
+            ":cantidad" => $_POST['cantidad'],
+            ":id" => $_POST['idProducto']
+        ));
+
+        $_SESSION['success'] = "Cantidad actualizada correctamente";
+    }
+
+
+    //Limpiar carrito
+    if(isset($_POST['empty'])){
+        $sql = "DELETE FROM carrito";
+        $stmt = $pdo -> query($sql);
+
+        $_SESSION['success'] = "Se ha limpiado el carrito de compras";
+    }
+
+    //Pagar
+    if(isset($_POST['pay'])){
+        header("Location: register.php");
+        return;
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,29 +194,7 @@
                         </li>
                         <li class="nav-item active">
                                 <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Registros
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                              <a class="dropdown-item" href="#">Clientes</a>
-                              <a class="dropdown-item" href="#">Proveedores</a>
-                              <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="#">Something else here</a>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Pagos
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                              <a class="dropdown-item" href="#">Por cobrar</a>
-                              <a class="dropdown-item" href="#">Por realizar</a>
-                              <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="#">Something else here</a>
-                            </div>
-                        </li>
+                        </li>                        
                     </ul>
                     <form class="form-inline m-auto my-2 my-lg-0">
                         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -199,36 +220,33 @@
             <table class="table table-stripped">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
+                                <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
-                                <th scope="col">Apellidos</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Password</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Cantidad</th>
                                 <th scope="col">Action</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
                         <?php                            
-                            $stmt = $pdo -> query("SELECT * FROM usuarios WHERE isAdmin = 1");
+                            $stmt = $pdo -> query("SELECT * FROM carrito");
                             while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
                                 echo "<tr>";
                                 echo "<th scope='row'>";
-                                echo ($row['idUsuarios']);
+                                echo ($row['idProducto']);
                                 echo "</th><td>";                                
                                 echo ($row['Nombre']);
                                 echo "</td><td>";                                
-                                echo ($row['Apellidos']);
+                                echo ($row['Precio']);
                                 echo "</td><td>";                                
-                                echo ($row['Email']);
-                                echo "</td><td>";                                
-                                echo ($row['Username']);
-                                echo "</td><td>";
-                                echo ($row['Password']);
-                                echo "</td><td>";
-                                echo ('<form method="post"><input type="hidden" ');
-                                echo ('name="idUsuarios" value="'.$row['idUsuarios'].'">'."\n");                          
-                                echo ('<input type="submit" value="Delete" name="delete">');
+                                echo '<form method="post">';
+                                echo '<input type="number" value="'.$row['Cantidad'].'" class="form-group" name="cantidad">' ;                           
+                                echo ('<input type="hidden" ');
+                                echo ('name="idProducto" value="'.$row['idProducto'].'">'."\n");
+                                echo '</td><td class="row justify-content-center">';                          
+                                echo ('<input type="submit" value="Delete" name="delete" class="col-3 btn bg-warning text-center">');
+                                echo ('<input type="submit" value="Update" name="update" class="col-3 offset-2 btn bg-primary text-center">');
                                 echo ("\n</form>\n");
                                 echo ("</td></tr>");                                
                             }
@@ -236,15 +254,25 @@
                         </tbody>
                     </table>
                     <?php
-                        if (isset($_SESSION['error'])){
-                            echo ('<p class="bg-primary">'.$_SESSION['error'].'</p>');
+                         if (isset($_SESSION['error'])){
+                            echo ('<p class="bg-primary mt-2">'.$_SESSION['error'].'</p>');
                             unset($_SESSION["error"]);
                         }    
                         
                         if (isset($_SESSION['success'])){
-                            echo ('<p class="bg-primary">'.$_SESSION['success'].'</p>');
+                            echo ('<p class="bg-primary mt-2">'.$_SESSION['success'].'</p>');
                             unset($_SESSION["success"]);
                         }  
+                    ?>
+                    <form method="post">
+                        <div class="row justify-content-center">
+                            <button type="submit" class="btn bg-primary col-sm-3 text-light" name="pay">Pagar</button>
+                            <button type="submit" class="btn bg-secondary col-sm-3 offset-sm-1 text-light" name="empty">Vaciar carrito</button>
+                        </div>
+                    </form>
+                    <?php
+                        
+                        
                     ?>
         </div>
     </main>

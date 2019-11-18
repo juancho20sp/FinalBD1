@@ -69,8 +69,8 @@
                             Registros
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="#">Clientes</a>
-                          <a class="dropdown-item" href="#">Proveedores</a>
+                          <a class="dropdown-item" href="clientes.php">Clientes</a>
+                          <a class="dropdown-item" href="proveedores.php">Proveedores</a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" href="inventario.php">Innventario</a>
                         </div>

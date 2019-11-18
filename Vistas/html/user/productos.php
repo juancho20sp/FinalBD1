@@ -1,8 +1,37 @@
 <?php
     require_once "../../../Gestion/pdo.php";
+    session_start();
 
-    $sql = "SELECT * FROM producto";
-    $stmt = $pdo -> query($sql);
+    
+
+    if(isset($_POST['cart'])){       
+
+        //Traemos los datos de ese producto
+        $sqlProducto = "SELECT Nombre, Precio_Venta FROM
+                            producto WHERE idProducto = {$_POST['idProducto']}";
+
+        $stmtProducto = $pdo -> query($sqlProducto);
+        $row = $stmtProducto -> fetch(PDO::FETCH_ASSOC);
+        $nombre = $row['Nombre'];
+        $precio = $row['Precio_Venta'];
+
+        echo "{$nombre} ha sido añadido al carrito";
+      
+        //-----------------------------------
+
+        //Llenamos el carrito
+
+        $sql = "INSERT INTO carrito (idProducto, Nombre, Precio, Cantidad)    
+                    VALUES (:id, :nombre, :precio, 1)";
+
+        $stmt = $pdo -> prepare($sql);
+        $stmt -> execute(array(
+            ":id" => $_POST['idProducto'],
+            ":nombre" => $nombre,
+            ":precio" => $precio
+        ));
+    }
+
 ?>
 
 
@@ -159,29 +188,7 @@
                         </li>
                         <li class="nav-item active">
                                 <a class="nav-link" href="nosotros.php">Nosotros <span class="sr-only">(Us)</span></a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Registros
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                              <a class="dropdown-item" href="#">Clientes</a>
-                              <a class="dropdown-item" href="#">Proveedores</a>
-                              <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="#">Something else here</a>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Pagos
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                              <a class="dropdown-item" href="#">Por cobrar</a>
-                              <a class="dropdown-item" href="#">Por realizar</a>
-                              <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="#">Something else here</a>
-                            </div>
-                        </li>
+                        </li>                        
                     </ul>
                     <form class="form-inline m-auto my-2 my-lg-0">
                         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -202,15 +209,21 @@
     
     <main>
         <div class="container">
-            <div class="row">
+            <div class="row justify-content-center">
             <!--Serán generados con PHP-->
             <?php
+                $sql = "SELECT * FROM producto";
+                $stmt = $pdo -> query($sql);
+                
                 while($producto = $stmt -> fetch(PDO::FETCH_ASSOC)){
-                    echo '<div class="card col-sm-3 text-center m-2">';
-                    echo '<img src="..." class="card-img-top" alt="...">';
+                    echo '<div class="card col-sm-4 text-center m-2">';
                     echo '<div class="card-body">';    
-                    echo '<h5 class="card-title">'.$producto['Nombre'].'</h5>';    
-                    echo '<a href="#" class="btn btn-primary">Añadir al carrito</a>';
+                    echo '<h5 class="card-title">'.$producto['Nombre'].'</h5>'; 
+                    echo '<p>In stock: '.$producto['Existencias'].'</p>'; 
+                    echo ('<form method="post"><input type="hidden" ');
+                    echo ('name="idProducto" value="'.$producto['idProducto'].'">'."\n");                          
+                    echo '<button type="submit" class="btn btn-primary" name="cart">Añadir al carrito</button>';
+                    echo ("\n</form>\n");                     
                     echo '</div></div>';                         
                 }
             ?>
