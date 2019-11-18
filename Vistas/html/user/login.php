@@ -1,9 +1,8 @@
-<?php
-    require_once "../../../Gestion/pdo.php";
+<?php    
+    require_once "../../../Gestion/loginValidation.php";  
     session_start();
 
-    //Iniciar sesión
-    if(isset($_POST['correo']) && isset($_POST['password'])){
+    if(isset($_POST['usuario']) && isset($_POST['password'])){
         unset($_SESSION['usuario']); //Logout al usuario actual
         
         $sql = "SELECT * FROM usuarios  WHERE
@@ -12,8 +11,8 @@
          
          $stmt = $pdo->prepare($sql);
          $stmt -> execute(array(
-             ':em' => $_POST['correo'],
-             ':usr' => $_POST['correo'],
+             ':em' => $_POST['usuario'],
+             ':usr' => $_POST['usuario'],
              ':pas' => $_POST['password']
          ));
  
@@ -21,59 +20,17 @@
  
          if($row === false){
              $_SESSION['error'] = 'Usuario o contraseña incorrecta.';
-             
+             header('Location: login.php');
+             return;
          } else {
              $_SESSION['usuario'] = $_POST['usuario'];
-             
+             header('Location: checkout.php');
+             return;
          }
      }
-
-     //Registrar Usuario
-     if(isset($_POST['correo']) && isset($_POST['password']) && isset($_POST['nombre'])
-           && isset($_POST['apellidos'])){
-
-        $sql = "INSERT INTO  usuarios (Identificacion, Nombre, Apellidos, Username,
-                Email, Password, Telefono, isAdmin) 
-                VALUES ( :id, :name, :lastname, :usr, :email, :pwd, :tel, FALSE)";
-        $sql2 = "INSERT INTO cliente (idCliente, Nombre, Apellido, Telefono, Email) 
-                VALUES (:id, :name, :lastname, :tel, :email)";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt2 = $pdo -> prepare($sql2);
-
-        $stmt -> execute(array(
-            ':id' => $_POST['cedula'],
-            ':name' => $_POST['nombre'],
-            ':lastname' => $_POST['apellidos'],
-            ':usr' => $_POST['username'],
-            ':email' => $_POST['correo'],
-            ':pwd' => $_POST['password'],
-            ':tel' => $_POST['phone']
-        ));
-
-        //Traemos el ID
-        $lookId = $pdo -> query("SELECT * FROM usuarios WHERE Identificacion = {$_POST['cedula']}");
-        $row = $lookId -> fetch(PDO::FETCH_ASSOC);
-
-        $stmt2 -> execute(array(
-            ':id' => $row['idUsuarios'],
-            ':name' => $_POST['nombre'],
-            ':lastname' => $_POST['apellidos'],
-            ':tel' => $_POST['phone'],
-            ':email' => $_POST['correo']
-        ));
-
-        $_SESSION['success'] = "Usuario registrado correctamente.";
-
-        unset($_SESSION['usuario']); //Logout al usuario actual
-        $_SESSION['usuario'] = $_POST['username'];
-
-        header('Location: checkout.php');
-        return;
-    } else {
-        $_SESSION['error'] = "Datos incompletos.";
-    }
+    
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,7 +40,7 @@
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../css/fontawesome/css/all.css">
     <link rel="stylesheet" href="../../html/user/css/indexStyle.css">
-    <title>Regístrate</title>
+    <title>Login</title>
 </head>
 <body class="super-container">
     <header class="container-fluid">
@@ -143,54 +100,19 @@
             <div class="card" role="">
                 <div class="">
                     <div class="card-title">
-                        <h3 class="m-3">Regístrate</h3>
+                        <h3 class="m-3">Ingresa tus credenciales</h3>
                     </div>
                     <div class="card-body">
                         <main class="container">
                             <form method="post">
                                 <div class="col-12">
                                     <div class="form-group row">
-                                        <label for="nombre" class="col-md-4 col-form-label">Nombre:</label>
+                                        <label for="usuario" class="col-md-4 col-form-label">Usuario:</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" name="nombre" id="nombre"
-                                                placeholder="Nombre" required>
+                                            <input type="text" class="form-control" name="usuario" id="usuario"
+                                                placeholder="Usuario" required>
                                         </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="apellidos" class="col-md-4 col-form-label">Apellidos:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" name="apellidos" id="apellidos"
-                                                placeholder="Apellidos" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="cedula" class="col-md-4 col-form-label">Documento de identidad:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" name="cedula" id="cedula"
-                                                placeholder="Documento de identidad" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="correo" class="col-md-4 col-form-label">Email:</label>
-                                        <div class="col-md-8">
-                                            <input type="email" class="form-control" name="correo" id="correo"
-                                                placeholder="Email" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="username" class="col-md-4 col-form-label">Username:</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" name="username" id="username"
-                                                placeholder="Username" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="phone" class="col-md-4 col-form-label">Teléfono:</label>
-                                        <div class="col-md-8">
-                                            <input type="tel" class="form-control" name="phone" id="phone"
-                                                placeholder="Teléfono" required>
-                                        </div>
-                                    </div>
+                                    </div>                                    
                                     <div class="form-group row">
                                         <label for="password"
                                             class="col-md-4 col-form-label">Contraseña:</label>
@@ -198,20 +120,12 @@
                                             <input type="password" class="form-control" name="password"
                                                 id="password" placeholder="Contraseña" required>
                                         </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="password2" class="col-md-4 col-form-label">Confirmar
-                                            contraseña:</label>
-                                        <div class="col-md-8">
-                                            <input type="password" class="form-control" name="password2"
-                                                id="password2" placeholder="Confrimar contraseña" required>
-                                        </div>
-                                    </div>
+                                    </div>                                    
                                 </div>
                                 <div class="text-center">
-                                                <button type="submit" class="btn btn-primary ml-1">Regístrate</button>
+                                                <button type="submit" class="btn btn-primary ml-1">Ingresar</button>
                                                 <button type="reset" class="btn btn-secondary">Cancelar</button> 
-                                                <a href="login.php" class="btn btn-success">Ya tengo una cuenta</a>                                               
+                                                <a href="register.php" class="btn btn-success">Volver</a>                                               
                                             </div>
                                         </form>
                                     </div>
